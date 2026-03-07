@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flightpad Log</title>
+  <style>
+    /* Single-column, scroll-friendly layout tuned for handwriting in Apple Notes. */
+    :root {
+      --base-font: 15px;
+      --base-gap: 72px;      /* Default vertical spacing between rows. */
+      --section-gap: 54px;   /* Extra gap before a new section. */
+      --intra-gap: 28px;     /* Horizontal gap between items that share a row. */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #111;
+      display: flex;
+      justify-content: center;
+      padding: 24px 0 64px;
+    }
+    #page {
+      width: min(94vw, 880px);
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 32px 28px 48px;
+      position: relative;
+      overflow: hidden;
+      transition: background-image 0.2s ease, background-size 0.2s ease, background-position 0.2s ease;
+    }
+    #page.overlay-on {
+      background-image: url('5454E984-55EF-439C-8BA5-FA9B8F15D9B6.png');
+      background-repeat: repeat-y;
+      background-position: center top;
+      background-size: contain;
+      opacity: 0.94;
+    }
+    #controls {
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+      z-index: 10;
+    }
+    #toggleOverlay {
+      border: 1px solid #bbb;
+      background: #fafafa;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s ease, border 0.15s ease;
+    }
+    #toggleOverlay:hover { background: #f0f0f0; border-color: #999; }
+    #toggleOverlay.active { background: #e7f1ff; border-color: #5a8dee; color: #1d4fbf; }
+    .row {
+      display: flex;
+      gap: var(--intra-gap);
+      align-items: baseline;
+      padding: 12px 4px;
+      margin: 0;
+    }
+    .row + .row { margin-top: calc(var(--base-gap) - 24px); }
+    .row.section + .row { margin-top: var(--section-gap); }
+    .label {
+      font-size: var(--base-font);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .section .label {
+      font-size: calc(var(--base-font) * 1.2);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div id="page">
+    <div id="controls">
+      <button id="toggleOverlay" aria-pressed="false">Show PNG overlay</button>
+    </div>
+    <div id="rows"></div>
+  </div>
+
+  <script>
+    // Ordered rows based on the PNG checklist. Items inside the same array share a row.
+    const rows = [
+      { labels: ['Departure'], section: true },
+      { labels: ['DEPARTING'] },
+      { labels: ['ELEVN'] },
+      { labels: ['WEIGHT'] },
+      { labels: ['RWY RQD'] },
+      { labels: ['ATIS'] },
+      { labels: ['GND'] },
+      { labels: ['TWR'] },
+      { labels: ['RWY'] },
+      { labels: ['TFC'] },
+      { labels: ['LENGTH'] },
+      { labels: ['V1'] },
+      { labels: ['VR'] },
+      { labels: ['XWIND'] },
+      { labels: ['TURN AT'] },
+      { labels: ['TPA'] },
+      { labels: ['DEPARTURE'] },
+      { labels: ['CLIMB TO'] },
+      { labels: ['CAPS'] },
+      { labels: ['Arrival'], section: true },
+      { labels: ['ARRIVING'] },
+      { labels: ['ELEV'] },
+      { labels: ['ATIS'] },
+      { labels: ['TWR'] },
+      { labels: ['GND'] },
+      { labels: ['FROM ALT'] },
+      { labels: ['TOD'] },
+      { labels: ['FINAL'] },
+      { labels: ['RWY'] },
+      { labels: ['TFC'] },
+      { labels: ['LENGTH'] },
+      { labels: ['TPA'] },
+    ];
+
+    const rowsContainer = document.getElementById('rows');
+
+    rows.forEach(row => {
+      const div = document.createElement('div');
+      div.className = 'row' + (row.section ? ' section' : '');
+      row.labels.forEach(text => {
+        const span = document.createElement('span');
+        span.className = 'label';
+        span.textContent = text;
+        div.appendChild(span);
+      });
+      rowsContainer.appendChild(div);
+    });
+
+    const toggle = document.getElementById('toggleOverlay');
+    const page = document.getElementById('page');
+    toggle.addEventListener('click', () => {
+      const on = page.classList.toggle('overlay-on');
+      toggle.classList.toggle('active', on);
+      toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
+      toggle.textContent = on ? 'Hide PNG overlay' : 'Show PNG overlay';
+    });
+  </script>
+</body>
+</html>
