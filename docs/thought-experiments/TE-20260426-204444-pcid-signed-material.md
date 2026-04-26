@@ -263,6 +263,8 @@ input still binds `pCID + payload`.
 
 - Do we want the canonical signing target to be tuple bytes directly or a
   tuple-derived CID?
+- Did we err in previous TEs by concluding that the envelope is `[pCID,
+  payload]` rather than `[pCID, payload, signature]`?
 - If signatures live in payload, what exact representation of payload is used
   when the signature field itself is present?
 - Should every authorial signature be required to bind `[pCID, payload]`, or

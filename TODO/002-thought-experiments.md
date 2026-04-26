@@ -1,5 +1,23 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-205931
+Date: 2026-04-26 20:59:31 UTC
+Status: active
+Decision:
+- TE `002.18` gains a follow-on question asking whether earlier TEs may have
+  erred by treating the envelope as `[pCID, payload]` instead of
+  `[pCID, payload, signature]`.
+Intent:
+- Keep the pCID signed-material TE open to the possibility that prior envelope
+  framing was too narrow once authorial signatures are required to bind meaning.
+Constraints:
+- This is a TE refinement only; it does not lock envelope shape.
+- Preserve the existing conclusions and add the new question as an explicit
+  follow-on item.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204444-pcid-signed-material.md`
+
 ID: DI-002-20260426-204443
 Date: 2026-04-26 20:44:43 UTC
 Status: active
