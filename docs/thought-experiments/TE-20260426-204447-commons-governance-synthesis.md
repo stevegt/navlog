@@ -129,6 +129,14 @@ Commons implication:
 - identity and accounting are useful for commons governance,
 - but they can become enclosure tools if one authority monopolizes them.
 
+The revised survey also sharpens an important distinction:
+
+- PromiseGrid can use mathematical or self-certifying identifiers such as
+  hash-derived `pCID`s, so protocol identity does not have to depend on one
+  central naming authority,
+- but mathematical naming does not remove governance pressure; discoverability,
+  curation, migration, and trust still gather around those identifiers.
+
 ### pCID signed material
 
 Once the commons lens is applied, `pCID` binding is not just about cryptic
@@ -168,6 +176,13 @@ But it also introduces governance costs:
 - local policy has to choose,
 - operators need information about handler quality,
 - free-riding and false claims become real possibilities.
+
+The survey update also changes how this should be framed:
+
+- the identifier itself may be self-certifying and mathematical,
+- but the surrounding questions are still social and institutional:
+  which handler claims are discoverable, which are trusted, and which indexes or
+  curation layers become influential.
 
 Commons implication:
 
@@ -224,8 +239,9 @@ Risks:
 ### Shape B: utility-core federation
 
 Some shared layers become more utility-like: stable accounting, durable
-routing conventions, maintenance institutions, maybe stronger common ingress
-or audit primitives.
+routing conventions, discovery or curation layers around self-certifying
+identifiers, maintenance institutions, maybe stronger common ingress or audit
+primitives.
 
 Strengths:
 
@@ -273,6 +289,8 @@ This shape remains useful as a challenge case even if it is not desirable.
   clear answer for observability and resource defense, looks incomplete.
 - Any design that quietly assumes someone else will fund and operate the hard
   shared layers looks naive.
+- Any design that assumes mathematical naming removes the need for governance,
+  discovery, or curation looks incomplete.
 
 ## What this synthesis still does not settle
 
@@ -280,7 +298,8 @@ This synthesis still does not lock:
 
 - exact ingress placement,
 - exact signing format,
-- exact routing economy or registry model,
+- exact routing economy or discovery/curation model around self-certifying
+  identifiers,
 - exact kernel authority over shared resources.
 
 It does produce a sharper framing:

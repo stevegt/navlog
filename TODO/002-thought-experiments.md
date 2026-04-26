@@ -1,5 +1,25 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-214013
+Date: 2026-04-26 21:40:13 UTC
+Status: active
+Decision:
+- Refine TE `002.21` so it inherits the revised `002.20` view that PromiseGrid
+  often uses mathematical or self-certifying identifiers rather than central
+  registries for protocol naming.
+Intent:
+- Keep the commons-governance synthesis aligned with the survey's updated claim
+  that governance pressure around naming shifts toward discovery, curation,
+  trust, maintenance, migration, and handler-claim selection around hash-based
+  identifiers.
+Constraints:
+- Preserve the synthesis's existing governance shapes and anti-enclosure frame.
+- Remove wording that implies a central registry is the main unresolved
+  institutional question for routing or protocol identity.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204447-commons-governance-synthesis.md`
+
 ID: DI-002-20260426-213159
 Date: 2026-04-26 21:31:59 UTC
 Status: active
