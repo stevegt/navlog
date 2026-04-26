@@ -136,7 +136,45 @@ Cons:
 - does not by itself solve the more important question of what bytes are
   signed.
 
-### 5) Layered signatures: author binds `[pCID, payload]`, others sign around it
+### 5) Transport sender signature over `['grid' tag, pCID, payload]`
+
+The transport sender signs the whole envelope, treating the `grid` family
+marker, `pCID`, and payload as one asserted object. In this model, the
+transport sender promises:
+
+- this object is a PromiseGrid-family message,
+- this payload conforms to `pCID`,
+- this is the exact envelope the sender chose to introduce at the current hop.
+
+Pros:
+
+- aligns the signature with the actor actually introducing the message into a
+  transport boundary,
+- may simplify early verification for kernel-first or handler-first ingress
+  because the first receiver can validate a sender-local promise before deeper
+  protocol interpretation,
+- makes the relationship between transport framing and protocol-shape assertion
+  explicit,
+- fits a world where relays, gateways, or ingress agents make real promises of
+  their own rather than being treated as invisible pipes.
+
+Cons:
+
+- changes the semantic center, because the transport sender rather than the
+  author is now making the first protocol-shape promise,
+- is weak as an end-to-end authorship mechanism when sender and author differ,
+- lets relays or gateways reassert protocol shape on behalf of authors,
+- becomes more brittle if the signed object includes wrapper choices that vary
+  by hop or transport,
+- may still need an additional authorial signature if the system wants end-to-
+  end accountability for message meaning.
+
+This alternative is strongest when sender and author are the same actor, or
+when the system explicitly wants a gateway/sender promise at ingress. It is
+weaker if the project wants the author's claim about `pCID + payload` to remain
+the primary semantic assertion.
+
+### 6) Layered signatures: author binds `[pCID, payload]`, others sign around it
 
 The author signs `pCID + payload`. Relays, transports, escrow agents,
 notaries, or local operators may add separate signatures about forwarding,
@@ -167,7 +205,11 @@ A message author creates payload `P` for protocol `A`. An intermediary swaps
 - payload-only signing over `P` fails to prevent this,
 - direct tuple signing prevents it,
 - tuple-hash signing prevents it if the hash or CID is derived from `[A,P]`,
-- detached or envelope signatures are fine if they still cover `[A,P]`.
+- detached or envelope signatures are fine if they still cover `[A,P]`,
+- sender-signed full envelopes prevent substitution only relative to the current
+  sender's promise; a later sender can still re-wrap and re-sign, so end-to-end
+  authorial meaning is not preserved unless there is also an author-level
+  binding.
 
 This scenario is the decisive reason that `pCID` has to be in the signed
 material if it is part of the author's meaning.
@@ -180,7 +222,10 @@ a relay protocol that keeps or drops the outer `grid(...)` wrapper.
 - signing wire bytes is fragile because wrappers vary,
 - signing canonical `[pCID, payload]` survives transport differences,
 - signing a CID of `[pCID, payload]` also survives if everyone derives the
-  same CID.
+  same CID,
+- sender-signed whole envelopes fit transport-adjacent verification better, but
+  they are more exposed to wrapper variation across hops and therefore couple
+  the promise more tightly to ingress placement.
 
 This favors signing the canonical tuple or its stable name, not transport
 wrapper bytes.
@@ -210,7 +255,26 @@ A flight-plan message may embed airport-note messages or ATC promises.
 
 This argues for authorial tuple binding at every message boundary.
 
-### Scenario 5: multi-signature or countersignature workflows
+### Scenario 5: sender-signed envelopes at ingress
+
+Suppose the transport sender signs `['grid' tag, pCID, payload]` and the first
+receiver wants to use that signature as an admission input.
+
+- kernel-first designs benefit most because the kernel can verify the sender's
+  envelope promise before dispatch,
+- handler-first designs can also use it, but then each ingress-owning handler
+  becomes the first verifier of the sender's claim,
+- hybrid designs can split the work, with the kernel checking sender-local
+  envelope promises while handlers later check author-level or payload-specific
+  claims,
+- the whole model interacts directly with ingress placement because it
+  privileges whichever component sees the transport boundary first.
+
+This does not settle whether sender-signed envelopes are primary or secondary.
+It does show that they are not merely a signature-format detail. They are a
+boundary-allocation choice.
+
+### Scenario 6: multi-signature or countersignature workflows
 
 A relay, reviewer, or regulator wants to add a signature after the author.
 
@@ -235,10 +299,12 @@ signing is too weak.
 
 ## What survives
 
-Two primary families survive:
+Three primary families survive:
 
 1. author signs canonical `[pCID, payload]` directly,
-2. author signs a stable hash or CID derived from `[pCID, payload]`.
+2. author signs a stable hash or CID derived from `[pCID, payload]`,
+3. transport senders sign `['grid' tag, pCID, payload]` as a sender-local or
+   ingress-local promise.
 
 Signature placement is still open:
 
@@ -250,6 +316,13 @@ The important point is that placement and signing target are separate
 questions. Payload-resident signatures remain viable so long as the signing
 input still binds `pCID + payload`.
 
+The remaining tension is not only about bytes. It is about who makes the
+primary promise:
+
+- the author, claiming message meaning end-to-end,
+- the transport sender, claiming envelope meaning at ingress,
+- or both in layered form.
+
 ## Candidate implications without locking them
 
 - If the repo keeps a message-CID concept, that CID becomes a strong signing
@@ -258,6 +331,10 @@ input still binds `pCID + payload`.
   becomes the simpler story.
 - Relay, notary, and transport signatures should be treated as additional
   promises layered around the author's promise, not as substitutes for it.
+- If the system wants to rely on sender-signed `['grid' tag, pCID, payload]`
+  envelopes, it also has to decide whether that is an additive ingress-layer
+  promise or a deliberate change in who is responsible for the first protocol-
+  shape assertion.
 
 ## Follow-on questions
 
@@ -269,5 +346,7 @@ input still binds `pCID + payload`.
   when the signature field itself is present?
 - Should every authorial signature be required to bind `[pCID, payload]`, or
   will some protocols be allowed to treat `pCID` as only local metadata?
+- If transport senders sign whole envelopes, is that an additive ingress-layer
+  promise, or a deliberate shift away from author-primary meaning claims?
 - How should secondary signatures declare that they are not the primary
   authorial meaning claim?

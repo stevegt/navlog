@@ -1,5 +1,49 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-212511
+Date: 2026-04-26 21:25:11 UTC
+Status: active
+Decision:
+- Refine TE `002.18` so the transport-sender-signed
+  `['grid' tag, pCID, payload]` model is integrated into the main alternatives
+  and scenario analysis rather than left only as a follow-on question.
+Intent:
+- Analyze the sender-signed whole-envelope model as a first-class alternative,
+  including how it shifts the promise from authorial meaning to sender-introduced
+  envelope meaning and how that interacts with ingress placement.
+Constraints:
+- Preserve the existing author-primary analysis and keep the sender-signed
+  envelope model explicit rather than letting it silently replace end-to-end
+  authorship.
+- Make the interaction with `TE-20260426-204445-kernel-vs-handler-ingress.md`
+  part of the main argument.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204444-pcid-signed-material.md`
+Supersedes: DI-002-20260426-211925
+
+ID: DI-002-20260426-211925
+Date: 2026-04-26 21:19:25 UTC
+Status: active
+Decision:
+- Refine TE `002.18` with a follow-on question asking whether the signed object
+  should instead be the whole `['grid' tag, pCID, payload]` envelope signed by
+  the transport sender, rather than author-signed `[pCID, payload]`.
+Intent:
+- Keep the signed-material TE open to a sender-asserted envelope model in which
+  the transport sender promises both that the payload conforms to `pCID` and
+  that the `pCID + payload` tuple conforms to the `grid` family marker.
+- Make the interaction with ingress placement explicit, since a sender-signed
+  envelope model changes who is making the first protocol-shape promise.
+Constraints:
+- This is a TE refinement only; it does not lock signer role, envelope shape,
+  or ingress architecture.
+- Preserve the existing author-primary analysis and add this as an explicit
+  follow-on question.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204444-pcid-signed-material.md`
+
 ID: DI-002-20260426-211406
 Date: 2026-04-26 21:14:06 UTC
 Status: active
