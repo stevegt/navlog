@@ -1,5 +1,65 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-232002
+Date: 2026-04-26 23:20:02 UTC
+Status: active
+Decision:
+- Rename the TE `002.25` artifact path from
+  `docs/thought-experiments/TE-20260426-230939-aviation-without-regulators.md`
+  to `docs/thought-experiments/TE-20260426-230939-grid-based-aviation.md`.
+Intent:
+- Keep the TE artifact name aligned with the new positive title and avoid
+  carrying the old negative framing in the filename.
+Constraints:
+- Keep the TE ID and document content unchanged apart from the file path.
+- Update the live corpus and task references to the new path.
+- Preserve older DI references as historical records rather than rewriting them.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-230939-grid-based-aviation.md`
+Supersedes: `DI-002-20260426-231610`
+
+ID: DI-002-20260426-231610
+Date: 2026-04-26 23:16:10 UTC
+Status: active
+Decision:
+- Rename TE `002.25` from "Aviation Without Regulators Thought Experiment" to
+  "Grid-based Aviation Thought Experiment" while keeping the existing file path.
+Intent:
+- Make the TE title state the positive architectural frame rather than defining
+  the scenario only by the absence of legacy regulators.
+Constraints:
+- Keep the TE content, TE ID, and file path unchanged.
+- Update the task label in `TODO/002-thought-experiments.md` to match the new
+  title while preserving the existing scenario description.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-230939-aviation-without-regulators.md`
+
+ID: DI-002-20260426-230939
+Date: 2026-04-26 23:09:39 UTC
+Status: active
+Decision:
+- Add TE `002.25` as a long-form world-building exercise about how an aviation
+  industry could emerge after the internet, without legacy regulators or
+  standards bodies, using PromiseGrid-style protocols and institutions instead.
+Intent:
+- Stress-test the full TE corpus against a concrete, safety-critical industry in
+  order to see how funding, certification, training, communications, airfield
+  operations, traffic coordination, and shared infrastructure could actually be
+  bootstrapped and governed without defaulting to central registries,
+  blockchains, DAOs, or other hype-driven abstractions.
+Constraints:
+- Keep the TE practical and institutionally serious.
+- Explicitly avoid cryptocurrency, blockchain, DAOs, and similar toxic or
+  overhyped framing.
+- Cover airfields, communications, navigation, aircraft design and inspection,
+  pilot and mechanic training, shared traffic systems, funding, maintenance,
+  and evolutionary stages of the industry.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-230939-aviation-without-regulators.md`
+
 ID: DI-002-20260426-220850
 Date: 2026-04-26 22:08:50 UTC
 Status: active
@@ -246,6 +306,7 @@ Affects:
 - `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`
 - `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
 - `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`
+- `docs/thought-experiments/TE-20260426-230939-aviation-without-regulators.md`
 
 ID: DI-002-20260426-184244
 Date: 2026-04-26 18:42:44 UTC
@@ -425,6 +486,7 @@ Thought experiments already written:
 - `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`
 - `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
 - `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`
+- `docs/thought-experiments/TE-20260426-230939-grid-based-aviation.md`
 
 ## Tasks
 
@@ -563,3 +625,14 @@ Thought experiments already written:
   hold keys, and how user-authorized signing works when the runtime itself
   cannot safely hold user private keys.
   See `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`.
+
+### Applied Domain / Aviation World-Building
+
+- [x] 002.25 Grid-based aviation thought experiment: imagine aircraft
+  are invented after the internet and no FAA, FCC, ICAO, Eurocontrol, or
+  comparable institutions exist; analyze how PromiseGrid-style protocols and
+  institutions could fund and govern airfields, coordinate aircraft, certify
+  designs and maintenance, train pilots and mechanics, manage communications and
+  navigation, and evolve an aviation industry without relying on blockchain,
+  cryptocurrency, or DAO framing.
+  See `docs/thought-experiments/TE-20260426-230939-grid-based-aviation.md`.
