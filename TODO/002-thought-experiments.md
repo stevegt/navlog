@@ -1,5 +1,32 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-022628
+Date: 2026-04-26 02:26:28 UTC
+Status: active
+Decision:
+- TE `002.10` evaluates the kernel/handler ABI primarily in a mixed-federation
+  world where signatures are payload-only and handlers are trusted but not
+  policy-authoritative.
+- The ABI under test must be transport-neutral and compatible with a small,
+  microkernel-like kernel boundary.
+- The TE proceeds in two stages: policy/trust analysis first, then the derived
+  report fields and resource-metering contract.
+- The TE must explicitly apply the Promise Theory rule that agents do not make
+  promises on behalf of other agents or providers.
+Intent:
+- Narrow the kernel/handler ABI design space before any DF questions or code/API
+  decisions are locked.
+- Force the TE to distinguish handler observations from kernel policy decisions
+  and provider-dependent promises.
+Constraints:
+- Do not lock a Go interface, wire format, or runtime-specific binding in this
+  DI entry.
+- Keep the TE focused on the boundary contract and kernel decision inputs:
+  resource triage, capability checks, and trust/reputation inputs.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`
+
 ID: DI-002-20260426-020018
 Date: 2026-04-26 02:00:18 UTC
 Status: active
@@ -51,6 +78,7 @@ store, refs, ledger, journal).
 Thought experiments already written:
 - `docs/thought-experiments/TE-20260425-173644-hashing.md`
 - `docs/thought-experiments/TE-20260425-162242-promises.md`
+- `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`
 
 ## Tasks
 
@@ -94,9 +122,10 @@ Thought experiments already written:
   - promise-theory / trusted-peers world
   - mixed federations interconnecting
   For each: what can kernels do without handlers? what requires handlers?
-- [ ] 002.10 Handler ABI thought experiment: if signatures are payload-only,
+- [x] 002.10 Handler ABI thought experiment: if signatures are payload-only,
   define a stable kernel<->handler report schema and resource-metering contract:
   inspect vs verify phases, budgets, timeouts, partial parsing, replay claims.
+  See `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`.
 - [ ] 002.11 Transition/upgrade scenarios: PQ migration, broken algorithms,
   multi-signature transitions, and how old kernels behave safely.
 
