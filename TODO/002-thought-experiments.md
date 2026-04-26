@@ -1,5 +1,32 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-180233
+Date: 2026-04-26 18:02:33 UTC
+Status: active
+Decision:
+- TE `002.15` covers where `pCID -> handler` routing entries come from and how
+  the kernel chooses among competing handlers.
+- The TE must compare kernel-curated routing, handler self-registration,
+  multiple-handler claims per `pCID`, imported/federated routing claims, and a
+  plural-currency/promise-economy alternative.
+- The TE must compare kernel roles as `policy owner`, `minimal registrar`, and
+  `exchange/matcher`.
+- The TE must explicitly reject single-currency/blockchain framing as a default
+  design assumption.
+Intent:
+- Extend the handler-lifecycle work so the kernel's dispatch decision is grounded
+  in an explicit model of where handler claims come from and how local selection
+  works.
+- Force the routing/selection discussion to take plural promises and kept/broken
+  promise history seriously without assuming one universal coin or market.
+Constraints:
+- Treat the economy/exchange idea as one core alternative, not as the presumed
+  winner.
+- Do not lock runtime APIs or storage layouts in this DI entry.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-180233-pcid-handler-routing.md`
+
 ID: DI-002-20260426-030507
 Date: 2026-04-26 03:05:07 UTC
 Status: active
@@ -111,6 +138,7 @@ Thought experiments already written:
 - `docs/thought-experiments/TE-20260425-173644-hashing.md`
 - `docs/thought-experiments/TE-20260425-162242-promises.md`
 - `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`
+- `docs/thought-experiments/TE-20260426-180233-pcid-handler-routing.md`
 
 ## Tasks
 
@@ -181,3 +209,11 @@ Thought experiments already written:
   The filename must begin with the TE ID (`TE-YYYYMMDD-HHMMSS`) and then use a
   descriptive suffix. Do not create placeholder docs; only create a doc once the
   thought experiment text exists.
+
+### Handler Routing / Registration
+
+- [x] 002.15 pCID handler routing thought experiment: where do `pCID -> handler`
+  routing entries come from, may more than one handler claim the same `pCID`,
+  how does the kernel choose among competing claims, and what role - if any -
+  should plural-currency/promise-economy matching play?
+  See `docs/thought-experiments/TE-20260426-180233-pcid-handler-routing.md`.
