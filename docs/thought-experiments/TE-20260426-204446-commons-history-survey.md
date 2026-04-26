@@ -103,8 +103,9 @@ What goes wrong:
 
 Relevance to PromiseGrid:
 
-- kernels, handler ecosystems, and shared protocol registries may behave more
-  like utilities than like a village pasture,
+- kernels, handler ecosystems, and shared protocol discovery or curation layers
+  may behave more like utilities than like a village pasture, even when the
+  protocol identifiers themselves are self-certifying hashes,
 - the system may need explicit maintenance and funding models rather than
   relying on volunteer surplus,
 - avoiding tragedy may require preventing both overuse and underfunded core
@@ -143,7 +144,12 @@ Relevance to PromiseGrid:
 - open protocols alone do not solve abuse,
 - decentralized architecture can still produce commons failures around trust,
   moderation, naming, maintenance, and funding,
-- protocol commons need governance institutions, not just open specs.
+- PromiseGrid can reduce central naming bottlenecks by using mathematical or
+  self-certifying identifiers, such as `pCID`s derived by hashing spec
+  documents,
+- but mathematical naming does not eliminate governance; discoverability,
+  curation, trust, maintenance, migration, and handler-claim selection still
+  need institutions and incentives around the hashes.
 
 ## Domain 4: centralized platforms, cloud, devops, and investment patterns
 
@@ -203,7 +209,7 @@ Shared resources include:
 
 - CPU, memory, storage, and bandwidth,
 - handler author attention and maintenance labor,
-- protocol namespace and legitimacy,
+- protocol identity, mathematical naming, discoverability, and legitimacy,
 - routing reputations and trust histories,
 - operator goodwill,
 - user attention and willingness to keep participating,
@@ -212,14 +218,28 @@ Shared resources include:
 Shared institutions include:
 
 - local sysadmin policy,
-- protocol specs,
-- handler registries or routing claims,
+- protocol specs and the hash conventions that turn them into self-certifying
+  identifiers,
+- local handler claims, routing claims, and optional indexes or registries that
+  help people discover and evaluate those claims,
 - social expectations about fair use,
 - dispute resolution and exclusion practices,
 - funding and maintenance arrangements.
 
 If any of those are overdrawn or captured, the whole system can suffer a
 tragedy even if the raw message transport still works.
+
+In PromiseGrid, many things that look like "registries" elsewhere are partly
+mathematical instead. A `pCID` can name a protocol by hashing its own spec, and
+content-addressed references can play similar roles elsewhere in the design.
+That reduces reliance on one central naming authority, but it does not remove
+commons-governance questions. The governance pressure moves outward into:
+
+- which specs people can find and understand,
+- which identifiers and handler claims they trust,
+- which indexes or discovery layers become socially important,
+- who maintains the surrounding tooling and documentation,
+- and how migrations or competing interpretations are handled over time.
 
 ## Cross-domain patterns
 

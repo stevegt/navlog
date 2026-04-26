@@ -1,5 +1,29 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-213159
+Date: 2026-04-26 21:31:59 UTC
+Status: active
+Decision:
+- Refine TE `002.20` so it does not imply that PromiseGrid depends mainly on
+  central registries for protocols or other core naming functions.
+- The TE must explicitly recognize mathematical or self-certifying
+  "registries", especially hash-derived identifiers such as `pCID`s derived
+  from spec documents.
+Intent:
+- Keep the commons-history survey aligned with the actual PromiseGrid design,
+  where cryptographic hashes often play the role that institutional registries
+  play in other ecosystems.
+- Clarify that governance still exists, but it shifts toward discoverability,
+  curation, trust, maintenance, migration, and handler-claim selection rather
+  than requiring one central naming authority.
+Constraints:
+- Preserve the survey's argument that governance institutions are still needed.
+- Reframe "registry" language so mathematical naming and local/shared indexes
+  are distinguished from central registries.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204446-commons-history-survey.md`
+
 ID: DI-002-20260426-212511
 Date: 2026-04-26 21:25:11 UTC
 Status: active
