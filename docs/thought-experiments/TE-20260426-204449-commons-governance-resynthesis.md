@@ -26,9 +26,13 @@ The new TEs sharpened four things:
 
 - `TE-20260426-204444-pcid-signed-material.md` clarified that accountable
   authorship requires binding `pCID + payload` when `pCID` is part of meaning,
+  and it now explicitly compares that author-primary model against a
+  transport-sender-signed `['grid' tag, pCID, payload]` envelope model,
 - `TE-20260426-204445-kernel-vs-handler-ingress.md` clarified that ingress is
   also a governance-placement question,
-- `TE-20260426-204446-commons-history-survey.md` widened the comparison set,
+- `TE-20260426-204446-commons-history-survey.md` widened the comparison set and
+  clarified that many PromiseGrid naming functions are mathematical or
+  self-certifying rather than centrally registry-driven,
 - `TE-20260426-204448-governance-vs-force.md` clarified that governance and
   coercion cannot be discussed as if they are unrelated.
 
@@ -40,7 +44,7 @@ The system has at least five overlapping commons:
 
 - machine resources,
 - local operator attention,
-- protocol and namespace legitimacy,
+- protocol identity, mathematical naming, discoverability, and legitimacy,
 - handler and app maintenance labor,
 - the broader inter-operator network and user trust ecology.
 
@@ -57,7 +61,25 @@ If authorship is weak, then cost attribution, moderation, routing trust, and
 historical accountability all weaken. Stable signed meaning is not the whole
 governance story, but it is part of the commons bookkeeping layer.
 
-### 3) Boundary placement is governance placement
+The updated signing TE also makes a second point unavoidable:
+
+- governance has to decide whether the primary protocol-shape promise is an
+  end-to-end authorial claim, a sender-local ingress claim, or a layered
+  combination of both.
+
+### 3) Mathematical naming changes governance, not the need for governance
+
+The updated survey and synthesis now make a sharper claim:
+
+- PromiseGrid can use mathematical or self-certifying identifiers such as
+  hash-derived `pCID`s, so protocol identity does not have to depend on one
+  central naming authority,
+- but that does not remove commons pressure around discovery, curation, trust,
+  migration, and handler-claim selection,
+- which means the real governance question is not "who runs the registry?" but
+  "which institutions around the hashes become socially authoritative?".
+
+### 4) Boundary placement is governance placement
 
 The ingress TE and the kernel-lifecycle TE now look like part of the same
 larger question:
@@ -68,7 +90,7 @@ larger question:
 Kernel-first, handler-first, and hybrid designs are therefore not only
 modularity choices. They distribute governance power differently.
 
-### 4) Minimal kernels are attractive but not self-justifying
+### 5) Minimal kernels are attractive but not self-justifying
 
 The microkernel TE still contributes an important caution:
 
@@ -81,13 +103,13 @@ But the newer commons work adds an equally important caution:
 
 Minimality survives as a design pressure, not as an automatic winner.
 
-### 5) Pluralism and utility pressure must coexist
+### 6) Pluralism and utility pressure must coexist
 
 The routing TE, the survey, and the synthesis all point the same way:
 
 - plurality of handlers, operators, and local policy is valuable,
-- some shared layers still need utility-like durability, maintenance, and
-  accounting.
+- some shared layers still need utility-like durability, maintenance,
+  accounting, and discovery/curation around self-certifying identifiers.
 
 The resynthesis does not choose exactly which layers are which, but it makes
 the split itself unavoidable.
@@ -132,7 +154,8 @@ Commons risk:
 Features:
 
 - local pluralism at the edges,
-- stronger shared accounting, maintenance, routing, or ingress substrate,
+- stronger shared accounting, maintenance, routing, ingress substrate, or
+  discovery/curation layers around self-certifying identifiers,
 - explicit support for durable shared institutions.
 
 Commons upside:
@@ -175,6 +198,8 @@ clusters look central.
 ### Cluster 1: accountable message meaning
 
 - Do we require authorial signatures to bind `[pCID, payload]` universally?
+- Is the primary meaning claim author-signed `[pCID, payload]`,
+  sender-signed `['grid' tag, pCID, payload]`, or a layered combination?
 - Do we sign tuple bytes or a tuple-derived CID?
 - How do secondary signatures avoid obscuring the primary authorial claim?
 
@@ -190,6 +215,8 @@ clusters look central.
 - Which maintenance burdens can stay local, and which need stronger shared
   institutions?
 - How are free-riding and invisible labor surfaced?
+- Which discovery, curation, and migration layers around self-certifying
+  identifiers become commons institutions in their own right?
 
 ### Cluster 4: governance and coercion boundaries
 
@@ -204,7 +231,8 @@ It still does not choose:
 
 - kernel-first vs handler-first,
 - payload vs envelope signature placement,
-- one handler registry or routing economy model,
+- one handler discovery/curation or routing-economy model around
+  self-certifying identifiers,
 - one institutional shape for the shared core.
 
 That is deliberate. The corpus is now rich enough that forcing a premature
@@ -219,5 +247,7 @@ defaults.
   strengthening even at some cost to autonomy?
 - How do we preserve plural governance while still making maintenance,
   accountability, and emergency response real?
+- How do we keep mathematical naming from quietly hardening into social
+  authority without accountability around discovery and curation?
 - What should the next DF round try to lock first: authorship/signing,
   ingress/governance boundary, or shared-resource accounting?

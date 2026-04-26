@@ -1,5 +1,30 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-214859
+Date: 2026-04-26 21:48:59 UTC
+Status: active
+Decision:
+- Refine TE `002.23` so it reflects the recent `002.20`, `002.21`, and
+  `002.18` updates:
+  - PromiseGrid often uses mathematical or self-certifying identifiers rather
+    than central registries for protocol naming,
+  - governance pressure therefore shifts toward discovery, curation, trust,
+    migration, and handler-claim selection around those identifiers,
+  - and the signed-material discussion now includes the sender-signed
+    `['grid' tag, pCID, payload]` envelope as a first-class alternative.
+Intent:
+- Keep the resynthesis aligned with the recent survey and synthesis corrections
+  and ensure it does not fall back to central-registry assumptions or overlook
+  the choice between author-primary and sender-primary first protocol-shape
+  promises.
+Constraints:
+- Preserve the existing anti-enclosure, anti-collapse framing and candidate
+  architectural families.
+- Keep this as a TE refinement only; do not lock architecture.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
+
 ID: DI-002-20260426-214013
 Date: 2026-04-26 21:40:13 UTC
 Status: active
