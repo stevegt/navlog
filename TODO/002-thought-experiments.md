@@ -1,5 +1,33 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-220037
+Date: 2026-04-26 22:00:37 UTC
+Status: active
+Decision:
+- Add TE `002.24` to examine how supported runtime environments change the
+  ingress boundary question from `002.19` and the signed-material question from
+  `002.18`.
+- The TE must cover at least these runtime families:
+  native general-purpose binaries, browser-hosted WASM, serverless WASM,
+  standalone WASM runtimes, standalone WASI runtimes, serverless WASI-style
+  runtimes, microcontroller firmware, mobile apps, game-engine embeddings, and
+  server-side applications that must trigger user-authorized signatures without
+  holding user private keys.
+Intent:
+- Keep the ingress and signing analysis honest by testing it against the actual
+  runtime diversity PromiseGrid wants to support rather than assuming one host
+  model.
+- Surface where "kernel-first" vs "handler-first" and "author-signed" vs
+  "sender-signed" are runtime-dependent rather than universal.
+Constraints:
+- Treat the TE as analysis only; do not lock one universal runtime architecture.
+- Make the TE explicitly connect back to
+  `TE-20260426-204444-pcid-signed-material.md` and
+  `TE-20260426-204445-kernel-vs-handler-ingress.md`.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`
+
 ID: DI-002-20260426-214859
 Date: 2026-04-26 21:48:59 UTC
 Status: active
@@ -198,6 +226,7 @@ Affects:
 - `docs/thought-experiments/TE-20260426-204447-commons-governance-synthesis.md`
 - `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`
 - `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
+- `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`
 
 ID: DI-002-20260426-184244
 Date: 2026-04-26 18:42:44 UTC
@@ -376,6 +405,7 @@ Thought experiments already written:
 - `docs/thought-experiments/TE-20260426-204447-commons-governance-synthesis.md`
 - `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`
 - `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
+- `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`
 
 ## Tasks
 
@@ -504,3 +534,13 @@ Thought experiments already written:
   full TE corpus again from the commons/governance perspective without locking
   design criteria prematurely.
   See `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`.
+
+### Runtime Environments / Host Constraints
+
+- [x] 002.24 Runtime environments thought experiment: compare the runtime
+  families PromiseGrid wants to support and examine how they change the ingress
+  boundary question from `002.19` and the signed-material question from
+  `002.18`, including who can own transports, who sees messages first, who can
+  hold keys, and how user-authorized signing works when the runtime itself
+  cannot safely hold user private keys.
+  See `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`.
