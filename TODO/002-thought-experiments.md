@@ -1,5 +1,24 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-220850
+Date: 2026-04-26 22:08:50 UTC
+Status: active
+Decision:
+- Refine TE `002.24` to add containers, virtual machines, and microVM or
+  microVM-like sandboxed hosts as explicit runtime families.
+Intent:
+- Keep the runtime TE honest about host isolation models that sit between native
+  processes and higher-level sandboxes, since they materially affect ingress
+  ownership, key custody, and host-versus-guest boundaries.
+Constraints:
+- Preserve the existing runtime analysis and add the new host models as
+  first-class runtime types rather than leaving them implicit under native or
+  serverless execution.
+- Keep the TE connected to `002.18` and `002.19`.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-220037-runtime-environments.md`
+
 ID: DI-002-20260426-220037
 Date: 2026-04-26 22:00:37 UTC
 Status: active

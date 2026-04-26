@@ -6,6 +6,7 @@ TODO: `002.24`
 ## Decision under test
 
 PromiseGrid does not target one runtime. It wants to run in native binaries,
+containers, virtual machines, microVM or microVM-like sandboxed hosts,
 browsers, serverless hosts, standalone WASM and WASI runtimes,
 microcontrollers, mobile apps, game engines, and server-side applications.
 
@@ -72,7 +73,88 @@ Signing:
 This runtime is the least constraining and therefore the worst default to
 universalize from.
 
-### 2) WASM in a browser tab
+### 2) Containers
+
+Containers share a host kernel while giving the process a more packaged and
+isolated deployment model.
+
+Ingress:
+
+- containerized PromiseGrid code can often still own guest-visible listeners and
+  sockets,
+- kernel-first, handler-first, and hybrid models usually remain real choices
+  inside the container,
+- but the orchestrator, service mesh, sidecar, CNI layer, reverse proxy, or
+  host firewall may already mediate some traffic before PromiseGrid sees it.
+
+Signing:
+
+- authorial signing is plausible if the container can safely reach OS keystores,
+  HSM clients, TPM proxies, remote signers, or companion agents,
+- sender-signed envelopes are natural for sidecars, relays, ingress proxies, or
+  operator-owned service boundaries,
+- containers are often the first place where host-managed secrets and app-level
+  authorial keys diverge sharply.
+
+Containers therefore look similar to native execution for internal structure,
+but more obviously depend on outer platform layers for networking, secret
+distribution, and policy.
+
+### 3) Virtual machines
+
+Virtual machines sit closer to native execution than containers do because the
+guest usually has its own kernel and network stack.
+
+Ingress:
+
+- guest-visible kernel-first, handler-first, and hybrid models are all again
+  real choices,
+- but the hypervisor, virtual NICs, host firewall, or cloud control plane may
+  still mediate the real machine-edge boundary above the guest,
+- the useful distinction is often between machine-edge ingress and
+  guest-visible ingress.
+
+Signing:
+
+- authorial signing is plausible when the guest can use virtual TPMs, secure
+  enclaves, host-mediated HSM access, or remote signers,
+- sender-signed envelopes are natural for VM-hosted gateways or relays,
+- layered models remain strong because VMs can host durable services while still
+  sitting under an operator or cloud host boundary.
+
+VMs therefore preserve many native-style choices while making the outer host
+layer more explicit.
+
+### 4) MicroVM or microVM-like sandboxed hosts such as Firecracker or gVisor
+
+These environments are narrower and more host-shaped than full VMs, but less
+ambient than ordinary processes.
+
+Ingress:
+
+- guest-visible ingress may still exist, but the host strongly shapes it through
+  jailer policies, virtual devices, sandboxed syscalls, proxy layers, or
+  platform-owned request delivery,
+- for Firecracker-like environments, the microVM may still feel VM-like inside,
+  while for gVisor-like environments the app may feel process-like but with a
+  much stronger host mediation layer,
+- PromiseGrid therefore has to ask both who sees ingress first inside the guest
+  and who already mediated it outside.
+
+Signing:
+
+- authorial signing is possible only if the host exposes some trustworthy key
+  path such as vTPM-like services, HSM proxies, remote signers, or delegated
+  user-signing flows,
+- sender-signed envelopes are often attractive because these environments are
+  commonly used as policy edges, gateways, or hardened service boundaries,
+- the runtime strongly encourages a distinction between guest-local promises and
+  higher-layer host or operator promises.
+
+These hosts are especially useful for stressing the difference between
+PromiseGrid-visible boundaries and true outer-host boundaries.
+
+### 5) WASM in a browser tab
 
 The browser owns the real transport substrate.
 
@@ -104,7 +186,7 @@ Signing:
 The browser runtime therefore favors a layered model: browser/tab as sender,
 user key material as author, and host APIs mediating both.
 
-### 3) WASM in a serverless environment
+### 6) WASM in a serverless environment
 
 A serverless host owns ingress, scheduling, and often most of the surrounding
 network stack.
@@ -135,7 +217,7 @@ Signing:
 This runtime strongly pressures the design toward sender-local or service-local
 signatures unless an explicit user-signing architecture exists.
 
-### 4) WASM in a standalone runtime such as Wasmtime or Wasmer
+### 7) WASM in a standalone runtime such as Wasmtime or Wasmer
 
 This looks more like native execution with explicit host capability boundaries.
 
@@ -160,7 +242,7 @@ Signing:
 This runtime reinforces a broader lesson: runtime labels matter less than host
 capability shape.
 
-### 5) WASI in a standalone runtime such as Wasmtime or Wasmer
+### 8) WASI in a standalone runtime such as Wasmtime or Wasmer
 
 WASI adds a more explicit capability-oriented contract, but the same basic point
 holds.
@@ -184,7 +266,7 @@ Signing:
 WASI strengthens the idea that ingress and signing are capability-distribution
 questions as much as they are process-boundary questions.
 
-### 6) WASI in a serverless-style environment
+### 9) WASI in a serverless-style environment
 
 Some hosts may expose WASI-like components inside a serverless or edge-managed
 lifecycle.
@@ -205,7 +287,7 @@ Signing:
 
 This is operationally closer to serverless WASM than to standalone WASI.
 
-### 7) Microcontroller firmware such as Arduino or ESP32
+### 10) Microcontroller firmware such as Arduino or ESP32
 
 Here the runtime may collapse almost everything into one firmware image.
 
@@ -229,7 +311,7 @@ Signing:
 
 This runtime favors fused or layered roles, not desktop-style process splits.
 
-### 8) Mobile apps on Android and iOS
+### 11) Mobile apps on Android and iOS
 
 The OS strongly mediates lifecycle, networking, background work, and secure key
 storage.
@@ -253,7 +335,7 @@ Signing:
 Mobile therefore looks like browser plus secure hardware: host-mediated ingress,
 but strong possibilities for user/device-bound signing.
 
-### 9) Embedded in a game engine such as Unity or Unreal
+### 12) Embedded in a game engine such as Unity or Unreal
 
 The engine owns the world loop, event model, and often networking abstractions.
 
@@ -274,7 +356,7 @@ Signing:
 
 This runtime again argues that the host often sits above any PromiseGrid kernel.
 
-### 10) Server-side applications that need user-authorized signatures without user private keys
+### 13) Server-side applications that need user-authorized signatures without user private keys
 
 This case deserves special treatment because it tests the boundary between
 service assistance and false authorship.
@@ -307,7 +389,9 @@ meaning.
 ### 1) The true first receiver is often the host, not PromiseGrid code
 
 Browsers, serverless platforms, mobile operating systems, and game engines all
-mediate ingress before any PromiseGrid kernel logic runs.
+mediate ingress before any PromiseGrid kernel logic runs. Containers, VMs, and
+microVM-like hosts often preserve more guest-visible choice, but they still add
+an outer host boundary that may mediate the real machine edge.
 
 Implication:
 
@@ -345,6 +429,8 @@ user-authorized signing more realistic than ephemeral serverless hosts do.
 On microcontrollers the roles may collapse.
 In browser tabs and engines they may be nested under a larger host.
 In serverless hosts they may both sit downstream of a platform-owned ingress.
+In containers, VMs, and microVM-like hosts they may be cleanly separated inside
+the guest while still sitting beneath an outer host policy layer.
 
 That does not make the TEs wrong. It changes how literally their boundaries can
 be realized in each runtime.
