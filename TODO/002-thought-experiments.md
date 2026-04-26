@@ -1,12 +1,56 @@
+## Decision Intent Log
+
+ID: DI-002-20260426-020018
+Date: 2026-04-26 02:00:18 UTC
+Status: active
+Decision:
+- The pre-TE-ID legacy thought experiment docs are renamed into TE-ID-prefixed
+  filenames using their filesystem mtimes as the TE timestamps.
+- The hashing thought experiment uses `TE-20260425-173644`.
+- The promises thought experiment uses `TE-20260425-162242`.
+Intent:
+- Bring the existing thought experiment corpus into compliance with the TE ID
+  filename rule without inventing synthetic timestamps unrelated to the docs'
+  actual creation history.
+Constraints:
+- Preserve the existing thought experiment content verbatim.
+- Keep the descriptive suffixes aligned with the original doc topics.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260425-173644-hashing.md`
+- `docs/thought-experiments/TE-20260425-162242-promises.md`
+
+ID: DI-002-20260426-015740
+Date: 2026-04-26 01:57:40 UTC
+Status: active
+Decision:
+- Required thought experiments (TEs) happen before final DF questions when
+  multiple plausible designs remain for a non-trivial decision.
+- Each TE uses a unique ID in the format `TE-YYYYMMDD-HHMMSS`.
+- Each completed TE is written verbatim to `docs/thought-experiments/` in a file
+  whose name begins with the TE ID and then uses a descriptive suffix.
+Intent:
+- Make DF questions narrower and more defensible by forcing scenario analysis
+  before final decision locking.
+- Keep TE artifacts auditable and unambiguous as the number of design bakeoffs
+  grows.
+Constraints:
+- Decision-first still means decision before coding.
+- TEs are analysis artifacts; DIs remain the mechanism for locking choices.
+Affects:
+- `AGENTS.md`
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/`
+
 ## Thought Experiments (Design Validation)
 
 This TODO tracks the remaining thought experiments we need to run before locking
 the navlog-001 wire/storage decisions for 001.4 (grid codec) and 001.5 (CAS
 store, refs, ledger, journal).
 
-Reference thought experiments already written:
-- `docs/thought-experiments/hashing.md`
-- `docs/thought-experiments/promises.md`
+Thought experiments already written:
+- `docs/thought-experiments/TE-20260425-173644-hashing.md`
+- `docs/thought-experiments/TE-20260425-162242-promises.md`
 
 ## Tasks
 
@@ -70,7 +114,7 @@ Reference thought experiments already written:
 ### Outputs
 
 - [ ] 002.14 For each thought experiment above, write a verbatim copy of the
-  thought experiment into a corresponding file under `docs/thought-experiments/`
-  using descriptive filenames (no numeric prefixes). Do not create placeholder
-  docs; only create a doc once the thought experiment text exists.
-
+  thought experiment into a corresponding file under `docs/thought-experiments/`.
+  The filename must begin with the TE ID (`TE-YYYYMMDD-HHMMSS`) and then use a
+  descriptive suffix. Do not create placeholder docs; only create a doc once the
+  thought experiment text exists.
