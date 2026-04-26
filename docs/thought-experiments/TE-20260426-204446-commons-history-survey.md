@@ -181,11 +181,18 @@ Resulting information and social effects:
 
 Relevance to PromiseGrid:
 
-- avoiding tragedy of the commons cannot just mean "centralize everything and
-  call it solved,"
-- but ignoring why centralization won in practice would be naive,
-- the system has to answer the real operational problems that platforms solved
-  while resisting the enclosure patterns they normalized.
+- PromiseGrid is not trying to solve commons failure by centralizing authority.
+- PromiseGrid is trying to make decentralized governance workable by giving
+  individuals and communities tools for metering, accountability, local policy,
+  and responsible stewardship of shared resources.
+- The challenge is not "should we centralize?" but "how do we recover the real
+  coordination, maintenance, and abuse-response capabilities that centralized
+  platforms provided, without reproducing enclosure and tenancy under a single
+  operator?"
+- In that sense, centralized platforms are best treated here as a challenge
+  case: they show which operational problems any serious decentralized system
+  must solve, even if their institutional answer is not the one PromiseGrid
+  wants.
 
 ## Domain 5: PromiseGrid itself as a commons
 

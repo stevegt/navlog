@@ -1,5 +1,27 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-211406
+Date: 2026-04-26 21:14:06 UTC
+Status: active
+Decision:
+- Refine TE `002.20` so the centralized-platform section states PromiseGrid's
+  positive decentralization thesis directly instead of framing it mainly as a
+  rejection of centralization.
+Intent:
+- Make the survey's PromiseGrid relevance section say plainly that PromiseGrid
+  aims to provide decentralized incentives, accountability, local/community
+  control, and stewardship of shared resources.
+- Keep centralized platforms as a challenge case rather than implying they are
+  candidate institutional answers for PromiseGrid.
+Constraints:
+- Preserve the historical comparison to centralized platforms, cloud, devops,
+  and investment patterns.
+- Do not weaken the survey's claim that PromiseGrid still has to solve the real
+  coordination, maintenance, and abuse-response problems those platforms solved.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204446-commons-history-survey.md`
+
 ID: DI-002-20260426-205931
 Date: 2026-04-26 20:59:31 UTC
 Status: active
