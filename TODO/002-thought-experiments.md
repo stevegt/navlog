@@ -1,5 +1,35 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-184244
+Date: 2026-04-26 18:42:44 UTC
+Status: active
+Decision:
+- TE `002.16` maps the promises, incentives, and disincentives among the major
+  actors in the system: owner, sysadmin, machine, operating system, kernel,
+  handlers, authors, and message senders.
+- TE `002.17` tests a stricter microkernel model in which the kernel is only a
+  message dispatcher and the kernel/handler conversation is limited to resource
+  usage, compensation, and throttling.
+- TE `002.17` must explicitly compare itself against the current handler-lifecycle
+  framing from `002.10`.
+- The resource-compensation angle in `002.17` must remain plural/promise-based
+  and must not collapse into a single-currency or blockchain framing.
+Intent:
+- Clarify which promises are actually being made in the system before overloading
+  the kernel with social, economic, or semantic responsibilities.
+- Stress-test whether the richer lifecycle framing from `002.10` is really a
+  kernel concern or should instead be pushed behind a more minimal dispatch
+  boundary.
+Constraints:
+- Treat both TEs as analysis artifacts only; do not lock APIs or storage
+  layouts.
+- Keep the microkernel TE explicit about what would survive, narrow, or be
+  superseded from earlier handler-lifecycle work.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-184245-system-promises.md`
+- `docs/thought-experiments/TE-20260426-184246-microkernel-dispatcher.md`
+
 ID: DI-002-20260426-180233
 Date: 2026-04-26 18:02:33 UTC
 Status: active
@@ -139,6 +169,8 @@ Thought experiments already written:
 - `docs/thought-experiments/TE-20260425-162242-promises.md`
 - `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`
 - `docs/thought-experiments/TE-20260426-180233-pcid-handler-routing.md`
+- `docs/thought-experiments/TE-20260426-184245-system-promises.md`
+- `docs/thought-experiments/TE-20260426-184246-microkernel-dispatcher.md`
 
 ## Tasks
 
@@ -217,3 +249,15 @@ Thought experiments already written:
   how does the kernel choose among competing claims, and what role - if any -
   should plural-currency/promise-economy matching play?
   See `docs/thought-experiments/TE-20260426-180233-pcid-handler-routing.md`.
+
+### System Roles / Kernel Minimality
+
+- [x] 002.16 System promise-map thought experiment: what promises are being made
+  among owner, sysadmin, machine, operating system, kernel, handlers, authors,
+  and messages, and what incentives or disincentives cause those promises to be
+  kept or broken?
+  See `docs/thought-experiments/TE-20260426-184245-system-promises.md`.
+- [x] 002.17 Microkernel dispatcher thought experiment: what if the kernel is
+  only a microkernel-style message dispatcher, and the only kernel/handler
+  conversation is about resource usage, compensation, or throttling?
+  See `docs/thought-experiments/TE-20260426-184246-microkernel-dispatcher.md`.
