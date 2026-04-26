@@ -1,5 +1,51 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-204443
+Date: 2026-04-26 20:44:43 UTC
+Status: active
+Decision:
+- Add six new TE artifacts in this exact order: `002.18` pCID signed material,
+  `002.19` kernel vs handler ingress, `002.20` commons history survey,
+  `002.21` commons governance synthesis, `002.22` governance vs force, and
+  `002.23` commons governance resynthesis.
+- Use these exact TE doc suffixes:
+  `pcid-signed-material`, `kernel-vs-handler-ingress`,
+  `commons-history-survey`, `commons-governance-synthesis`,
+  `governance-vs-force`, and `commons-governance-resynthesis`.
+- Split the commons/governance work into a full survey plus two separate
+  synthesis artifacts, with the force TE standing as a parallel analysis rather
+  than a minor subsection.
+- Treat the six TEs as informative and comparative. They may surface candidate
+  designs and later DF questions, but they must not prematurely lock design
+  criteria.
+Intent:
+- Extend the TE corpus so authorship/signature binding, ingress placement,
+  commons history, governance, and force are explored before the next round of
+  DF questions.
+- Put the decentralized ecology of nodes, kernels, handlers, apps, owners,
+  operators, developers, and users into explicit commons/governance context.
+Constraints:
+- `002.18` is author-primary and examines how the author's signature can bind
+  `pCID + payload`.
+- `002.19` uses the full boundary model: transport ownership, signature
+  verification, admission, routing, and resource control, with common
+  microkernels as comparators.
+- `002.20` must treat pre-electronic commons, public infrastructure and
+  utility-style commons, the open/early internet and protocol commons, and the
+  last 20-30 years of centralized platforms/cloud/devops/investment patterns as
+  first-class domains.
+- `002.22` treats governance and force as parallel analyses with a combined
+  human-and-system lens.
+- `002.23` is a separate final TE artifact, not a revision of `002.21`.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-204444-pcid-signed-material.md`
+- `docs/thought-experiments/TE-20260426-204445-kernel-vs-handler-ingress.md`
+- `docs/thought-experiments/TE-20260426-204446-commons-history-survey.md`
+- `docs/thought-experiments/TE-20260426-204447-commons-governance-synthesis.md`
+- `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`
+- `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
+
 ID: DI-002-20260426-184244
 Date: 2026-04-26 18:42:44 UTC
 Status: active
@@ -171,6 +217,12 @@ Thought experiments already written:
 - `docs/thought-experiments/TE-20260426-180233-pcid-handler-routing.md`
 - `docs/thought-experiments/TE-20260426-184245-system-promises.md`
 - `docs/thought-experiments/TE-20260426-184246-microkernel-dispatcher.md`
+- `docs/thought-experiments/TE-20260426-204444-pcid-signed-material.md`
+- `docs/thought-experiments/TE-20260426-204445-kernel-vs-handler-ingress.md`
+- `docs/thought-experiments/TE-20260426-204446-commons-history-survey.md`
+- `docs/thought-experiments/TE-20260426-204447-commons-governance-synthesis.md`
+- `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`
+- `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`
 
 ## Tasks
 
@@ -261,3 +313,41 @@ Thought experiments already written:
   only a microkernel-style message dispatcher, and the only kernel/handler
   conversation is about resource usage, compensation, or throttling?
   See `docs/thought-experiments/TE-20260426-184246-microkernel-dispatcher.md`.
+
+### Authorial Meaning / Signature Binding
+
+- [x] 002.18 pCID signed-material thought experiment: if `pCID` is part of the
+  author's claimed meaning, how must the author's signature bind `pCID +
+  payload`, and what are the viable placement and signing-input options for
+  making that happen?
+  See `docs/thought-experiments/TE-20260426-204444-pcid-signed-material.md`.
+
+### Ingress / Transport Boundary
+
+- [x] 002.19 Kernel-vs-handler ingress thought experiment: do messages arrive
+  at the kernel first or at handlers first, and how do transport ownership,
+  signature verification, admission, routing, and resource control differ among
+  kernel-first, handler-first, and hybrid designs?
+  See `docs/thought-experiments/TE-20260426-204445-kernel-vs-handler-ingress.md`.
+
+### Commons / Governance / Force
+
+- [x] 002.20 Commons history survey: compare pre-electronic commons, public
+  infrastructure and utility-style commons, the open/early internet and
+  protocol commons, and the last 20-30 years of centralized
+  platforms/cloud/devops/investment patterns, while treating the entire
+  decentralized PromiseGrid ecology as a commons in its own right.
+  See `docs/thought-experiments/TE-20260426-204446-commons-history-survey.md`.
+- [x] 002.21 Commons governance synthesis: re-examine the existing TE corpus
+  plus the new signing, ingress, and survey work through the primary goal of
+  avoiding tragedy of the commons, using anchor cases plus challenge cases.
+  See `docs/thought-experiments/TE-20260426-204447-commons-governance-synthesis.md`.
+- [x] 002.22 Governance-vs-force thought experiment: analyze the tension
+  between promise-based governance and use of force through a combined
+  human-and-system lens, using both the full survey and the early synthesis as
+  inputs.
+  See `docs/thought-experiments/TE-20260426-204448-governance-vs-force.md`.
+- [x] 002.23 Commons governance resynthesis: after the force TE, revisit the
+  full TE corpus again from the commons/governance perspective without locking
+  design criteria prematurely.
+  See `docs/thought-experiments/TE-20260426-204449-commons-governance-resynthesis.md`.
