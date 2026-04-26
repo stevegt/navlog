@@ -1,8 +1,40 @@
 ## Decision Intent Log
 
+ID: DI-002-20260426-030507
+Date: 2026-04-26 03:05:07 UTC
+Status: active
+Decision:
+- TE `002.10` is reframed around the kernel lifecycle for a received
+  `grid([pCID, payload])` message rather than only a generic report-schema
+  boundary.
+- The revised TE distinguishes three phases:
+  `inspect`, `verify`, and `execute`.
+- `inspect` is primarily a handler-provided, read-only payload triage step after
+  pCID routing.
+- `verify` remains a pre-process gate in this pass; the kernel may still discard
+  after inspect and/or verify.
+- `execute` means post-admission handler work, not only side effects.
+- The revised TE explicitly compares `inspect -> verify -> execute` and
+  `verify -> execute`, and evaluates whether `inspect -> execute` survives only
+  as a constrained special case.
+Intent:
+- Reframe the TE from the kernel's actual decision point: whether a received
+  message should be discarded or admitted into handler-controlled execution.
+- Make the inspect/verify distinction defensible now that signatures are moving
+  into payload and the kernel needs handler help before execution.
+Constraints:
+- Keep the existing TE artifact path and revise it in place.
+- Do not lock a Go interface, wire format, or runtime binding in this DI entry.
+- Keep the TE aligned with the earlier promise-based and hashing thought
+  experiments.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`
+Supersedes: DI-002-20260426-022628
+
 ID: DI-002-20260426-022628
 Date: 2026-04-26 02:26:28 UTC
-Status: active
+Status: superseded
 Decision:
 - TE `002.10` evaluates the kernel/handler ABI primarily in a mixed-federation
   world where signatures are payload-only and handlers are trusted but not
@@ -122,9 +154,11 @@ Thought experiments already written:
   - promise-theory / trusted-peers world
   - mixed federations interconnecting
   For each: what can kernels do without handlers? what requires handlers?
-- [x] 002.10 Handler ABI thought experiment: if signatures are payload-only,
-  define a stable kernel<->handler report schema and resource-metering contract:
-  inspect vs verify phases, budgets, timeouts, partial parsing, replay claims.
+- [x] 002.10 Kernel/handler lifecycle thought experiment: for a received
+  `grid([pCID, payload])`, define how the kernel chooses `discard` vs
+  `process via handler`, and what `inspect`, `verify`, and `execute` mean,
+  including whether the generic model is `inspect -> verify -> execute` or
+  `verify -> execute`.
   See `docs/thought-experiments/TE-20260426-022628-kernel-handler-abi.md`.
 - [ ] 002.11 Transition/upgrade scenarios: PQ migration, broken algorithms,
   multi-signature transitions, and how old kernels behave safely.

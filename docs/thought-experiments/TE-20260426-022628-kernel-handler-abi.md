@@ -5,359 +5,392 @@ TODO: `002.10`
 
 ## Decision under test
 
-If signatures live only in payload, what kernel/handler ABI best supports
-resource allocation, spam filtering, capability checks, and long-horizon
-evolution while keeping the kernel small?
+Pretend the kernel receives `grid([pCID, payload])`.
 
-The boundary under test is not a Go interface or a wire format yet. It is the
-semantic contract between a microkernel-like PromiseGrid kernel and trusted
-protocol handlers.
+The kernel can always do trivial local checks first: parse the envelope, confirm
+that `pCID` is known locally, enforce coarse size limits, and reject obviously
+bad transport input. That part is not the question.
+
+The real question starts after that: once `pCID` identifies a trusted local
+handler family, what phases should exist before the message is fully admitted
+into handler-controlled processing?
+
+The original binary framing is:
+
+- discard it
+- process it via the handler specified by the `pCID`
+
+That framing is too coarse once signatures move into payload. If the kernel
+needs payload-specific facts in order to decide whether full processing is safe,
+then it needs a read-only way to consult the handler before it commits to
+execution.
+
+So this TE asks:
+
+- what is `inspect`?
+- what is `verify`?
+- what is `execute`?
+- why are `inspect` and `verify` not the same thing?
+- should the generic lifecycle be `inspect -> verify -> execute`, or can it be
+  `verify -> execute`, or sometimes `inspect -> execute`?
+
+## Grounding from earlier thought experiments
+
+This TE builds on two earlier conclusions.
+
+From `TE-20260425-162242-promises.md`:
+
+- signatures can live inside payload,
+- kernels are intentionally small,
+- handlers are trusted but should not make promises on behalf of providers or
+  the kernel's local policy,
+- provider promises and revocable capabilities often require more than bare
+  cryptographic validity.
+
+From `TE-20260425-173644-hashing.md`:
+
+- the envelope is primarily for routing,
+- `pCID` identifies payload semantics,
+- the kernel should not assume that envelope-level structure answers payload-level
+  trust or execution questions.
+
+Taken together, those two TEs imply that the kernel can route on `pCID`, but it
+cannot safely jump straight from routing to execution for every protocol.
 
 ## Assumptions
 
-- The outer envelope is used for routing to a local pCID handler; signatures and
-  attestations live inside payload.
-- A kernel only runs handlers that it trusts, but trusted handlers can still be
-  buggy, stale, or compromised.
-- A kernel can trust some peers and distrust others; mixed federations are the
-  normal case, not an edge case.
-- The kernel is intentionally small. It owns admission control, budget
-  allocation, scheduling, storage decisions, and local trust policy.
-- Handlers own payload semantics. They parse payloads, understand signature
-  schemes, and understand protocol-specific capability/token structures.
-- Mark Burgess's Promise Theory rule applies: an agent must not make promises on
-  behalf of another agent. A handler may report what it observed or verified,
-  but it must not claim that a remote provider will honor a token unless the
-  provider itself has just made that promise to the kernel.
-- Capability tokens are provider promises. Revocation is real. Offline
-  cryptographic validity is not the same as current provider willingness.
-- The ABI should be transport-neutral so the same contract can be used for
-  in-process calls, subprocesses, message passing, or sandboxed runtimes.
+- Signatures and attestations live inside payload.
+- The kernel only runs handlers that it trusts, but trusted handlers can still
+  be buggy, stale, or compromised.
+- Mixed federations are normal. Some peers are more trusted than others.
+- The kernel is intentionally small. It owns admission control, budgeting,
+  scheduling, replay policy, and local trust policy.
+- Handlers own payload semantics. They know how to parse, inspect, verify, and
+  execute protocol-specific messages.
+- Mark Burgess's Promise Theory rule applies: a handler may report facts about
+  what it observed or verified, but it must not make promises on behalf of other
+  agents or providers.
+- A capability token is a provider promise. Revocation is real. "Signature
+  verifies" is not the same as "provider will currently honor this."
+- The ABI should be transport-neutral so the same conceptual contract can work
+  in-process, out-of-process, or in a sandbox.
 
-## Alternatives
+## Phase definitions
 
-### A. Single-call verdict ABI
+### Inspect
 
-The kernel gives the handler a message and a budget. The handler parses,
-verifies, and returns one final summary.
+`inspect` is a read-only, handler-provided triage step. Its job is to tell the
+kernel whether deeper work is justified.
 
-### B. Two-phase inspect/verify ABI
+`inspect` is intentionally cheap and bounded. It answers questions like:
 
-The kernel first asks for a cheap bounded inspection result. It then chooses
-whether to spend more budget on deeper verification.
+- does this payload have the shape of something this protocol understands?
+- what kind of operation does it claim to be?
+- does it appear to carry signatures, capabilities, or other claims that will
+  require verification before execution?
+- what rough resource cost will verification or execution have?
+- is there an obvious reason to discard this message now?
 
-### C. Continuation/dependency ABI
+`inspect` is not for proving strong claims. It is for fast triage.
 
-The handler may return "needs provider/dependency/freshness check" together with
-state needed to resume later.
+### Verify
 
-### D. Policy-delegating ABI
+`verify` is a stronger pre-execution gate. It exists because payload-contained
+signatures and capabilities often require protocol-specific checking before the
+kernel should admit execution.
 
-The handler returns not only observations but also routing, quota, trust, or
-admission decisions for the kernel to enforce.
+`verify` is usually more expensive than `inspect`. Depending on the protocol, it
+may be purely local, or it may involve protocol-specific dependency checks. This
+TE does not lock one universal verification mechanism. It only treats `verify`
+as a distinct phase whose purpose is to produce stronger admissibility facts than
+`inspect` can provide cheaply.
+
+In this pass, `verify` is still a pre-process gate: the kernel may discard after
+`verify`.
+
+### Execute
+
+`execute` is any post-admission handler work. It is what happens after the
+kernel decides the message should actually be processed by the handler.
+
+`execute` is intentionally broader than "side effects." It may include read-only
+post-admission work, queueing, state transitions, writes, or provider-facing
+actions. The key point is that `execute` is no longer just evidence gathering.
+It is the handler carrying out the protocol's actual work.
+
+## Why `inspect` and `verify` are not the same
+
+They differ in purpose.
+
+- `inspect` answers: "is this message even worth spending more on?"
+- `verify` answers: "have I gathered strong enough evidence to admit execution?"
+
+If the kernel skips `inspect`, then every dubious message pays the cost of
+verification just to discover it was obviously discardable. That weakens the
+kernel's resource-control position.
+
+If the kernel skips `verify`, then moving signatures into payload loses much of
+its value. The kernel has no strong protocol-specific gate before execution, and
+payload-contained claims become too easy to treat as mere syntax.
+
+So `inspect` and `verify` are not duplicates. One is cheap triage. The other is
+stronger pre-execution checking.
+
+## Why `inspect` and `verify` are not the only phases
+
+They are not the only phases. `execute` is distinct and should stay distinct.
+
+The old TE overemphasized the read-only boundary and under-described what the
+kernel is actually deciding. The kernel is not merely deciding whether to spend
+more budget on introspection. It is deciding whether to admit the message into
+handler-controlled processing.
+
+That means a lifecycle model with only `inspect` and `verify` is incomplete.
+Once the kernel has enough evidence, something different happens: the handler is
+allowed to do actual work. That is `execute`.
+
+## Lifecycle alternatives
+
+### A. `inspect -> verify -> execute`
+
+The kernel first asks for cheap triage, then asks for stronger checks if needed,
+then admits execution.
+
+### B. `verify -> execute`
+
+The kernel skips cheap triage and uses verification as the first meaningful
+handler consultation.
+
+### C. `inspect -> execute`
+
+The kernel performs cheap triage and then admits execution without a distinct
+verification phase.
+
+### D. single-call `process`
+
+The kernel gives the handler the message once and the handler internally decides
+how much to inspect, verify, and execute before returning.
 
 ## Scenario analysis
 
-## 1) Same-federation routine traffic
+## 1) Obvious garbage or low-value spam
 
-A pilot, airport, or FBO sends a normal message within one federation. The
-sender is already transport-trusted. The kernel mostly wants cheap scheduling
-and logging decisions.
+The payload is malformed, oversized for the protocol, or syntactically wrong in
+a way the handler can spot cheaply.
 
-Alternative A works, but it spends verification effort too early. A store-only
-node or low-priority relay still pays full parse/verify cost just to learn the
-message is probably fine.
+Alternative A works well. `inspect` can reject early without spending verification
+budget.
 
-Alternative B fits the microkernel goal better. Inspect can cheaply identify the
-protocol, claimed principals, replay tokens, rough resource demand, and whether
-full verification is even useful for this node.
+Alternative B is wasteful. The kernel must pay for a heavier path even though
+the message was obviously not worth it.
 
-Alternative C adds value only when the message depends on external freshness or
-slow checks. For routine same-federation traffic it is unnecessary overhead as a
-primary model.
+Alternative C also works for early rejection, but only because `inspect` can
+discard before execution. It says nothing about cases that need stronger checks.
 
-Alternative D is unnecessary here and expands trust in handlers too far. The
-kernel already owns local budget and routing policy.
+Alternative D hides too much from the kernel. The kernel loses visibility into
+whether it paid a cheap reject cost or a heavy verification cost.
 
-Observation: routine traffic argues for a cheap first phase, not a mandatory
-full-verification path.
+Observation: a cheap inspect phase is valuable even if many messages later need
+verification.
 
-## 2) Cross-federation edge with partial trust
+## 2) Payload carries signatures that matter to admissibility
 
-A message arrives from a federation that is transport-trusted enough to accept
-the connection, but not trusted enough to grant local resources purely on
-transport identity.
+The message's meaningful claims live inside payload. The kernel cannot evaluate
+them from the envelope alone.
 
-Alternative A can verify deep claims, but it collapses all useful distinctions
-into one expensive call. The kernel learns too late whether the handler needed
-remote dependencies, whether identity is merely claimed, and how much cost was
-spent to reach the verdict.
+Alternative A fits this case directly. `inspect` can tell the kernel that
+verification-bearing claims are present, and `verify` can then decide whether
+execution should be admitted.
 
-Alternative B lets the kernel ask first: who is claimed, what is locally
-verifiable, what is externally dependent, and what is the likely cost of deeper
-checks? That lets the kernel decide whether this federation gets more CPU, more
-queue depth, or only cold storage.
+Alternative B can still work, but it makes every such message pay verification
+cost immediately, even when a cheap inspect could have rejected malformed or
+irrelevant inputs.
 
-Alternative C matters here because cross-federation capability checks often
-depend on provider freshness, revocation, or local federation policy. The kernel
-needs an explicit way to distinguish "cryptographically intact" from
-"currently honored by provider."
+Alternative C is too weak as the generic model. If signatures moved into
+payload precisely so that protocol-specific verification can happen there, then
+`inspect -> execute` throws away that stronger gate.
 
-Alternative D is wrong for the Promise Theory constraint. A handler may say
-"provider X issued token Y and signature Z verified" or "provider freshness is
-unknown," but it must not say "admit this message because provider X will honor
-it." That would be the handler making a promise on behalf of provider X and on
-behalf of the kernel's local policy.
+Alternative D again hides the kernel's cost and gating logic inside a single
+opaque call.
 
-Observation: mixed federations require the handler to return conditional facts
-and dependency states, not final policy.
+Observation: payload-contained signatures strongly argue for a distinct verify
+phase before generic execution.
 
-## 3) Replay or spam using expensive verification paths
+## 3) Same-federation routine traffic
 
-An attacker, or a peer that broke a promise, sends traffic designed to trigger
-expensive crypto, large partial parses, or repeated revocation lookups.
+The sender is transport-trusted and the message is routine. The kernel wants to
+stay cheap and fast.
 
-Alternative A is weakest here. The handler either burns budget to reach a final
-answer or returns a shallow answer that mixes "not yet verified" with "invalid."
-The kernel cannot easily meter verification separately from initial triage.
+Alternative A still behaves well. Inspect can quickly confirm that the message
+looks routine and can report whether verify is actually needed for this protocol
+operation.
 
-Alternative B is strongest. Inspect can be bounded tightly: limit bytes parsed,
-nesting depth, signatures examined, and CPU time. The inspect report can say
-what was observed, whether parsing was truncated, and the projected cost of
-verification. The kernel can then decide whether the sender or federation has
-earned that spend.
+Alternative B may be acceptable for a protocol that has no meaningful cheap
+inspect path. But as the generic model it is too eager to spend verification
+budget.
 
-Alternative C remains useful as a result state. If verification requires online
-provider checks, the handler can say so without consuming unbounded time.
+Alternative C is tempting here. For low-risk operations with no verification-
+bearing claims, `inspect -> execute` may be acceptable as a constrained special
+case. But that is not enough to make it the generic cross-protocol model.
 
-Alternative D again fails because it blurs observation with policy. The kernel
-needs facts and costs so it can enforce its own anti-spam promises.
+Observation: same-federation routine traffic argues for allowing some protocols
+to make verify unnecessary, but not for removing inspect.
 
-Observation: resource triage strongly favors a split between cheap observation
-and expensive verification.
+## 4) Revocable provider promises and capability tokens
 
-## 4) Revocable provider promises and offline dependencies
+The message presents a capability token or other provider promise whose current
+honor status may differ from its offline cryptographic validity.
 
-A capability token claims access to a runway note, airport dataset, ATC slot, or
-other provider-controlled resource. The token verifies cryptographically, but
-the provider may have revoked it or may be offline.
+Alternative A gives the kernel the most control. Inspect can cheaply identify
+that provider-dependent claims are present. Verify can then return stronger
+statuses such as "locally valid," "dependency unresolved," or "provider state
+required" before execution is admitted.
 
-Alternative A encourages overclaiming. A single final verdict tends to compress
-"signature valid, provider offline" and "provider confirmed" into one status
-unless the ABI is already rich enough to express dependency states.
+Alternative B can work, but only by making verify the first expensive step for
+every such message.
 
-Alternative B helps, but only if verify results can report conditional outcomes.
-Inspect may notice token issuer, token id, expiry hints, and the fact that
-online freshness is required. Verify may then either confirm with the provider
-or return a dependency status.
+Alternative C is too weak in the generic case. Inspect alone should not be
+treated as a substitute for provider- or signature-related checks.
 
-Alternative C is essential here, but not as an entirely separate architecture.
-It is better modeled as a verify outcome: "provider-unreachable," "revocation
-unknown," "deferred," or "requires provider X query."
+Observation: provider promises are a strong argument against `inspect -> execute`
+as the default lifecycle.
 
-Alternative D is the most dangerous in this scenario. If the handler returns a
-policy verdict such as "authorized," it risks speaking for the provider. That
-violates the Promise Theory constraint unless the provider itself was queried and
-the result is explicitly time-bounded and attributable.
+## 5) Relay or archival node
 
-Observation: provider-dependent truths must stay conditional in the ABI. The
-kernel needs to see the condition, not just a flattened authorization verdict.
+Some nodes want minimal semantic cost. They may need to reject junk, bucket
+messages, or delay stronger work.
 
-## 5) Mixed-version evolution over decades
+Alternative A is flexible. The node can stop after inspect when all it wants is
+triage, queueing, or coarse policy.
 
-Kernels and handlers will evolve at different speeds. Some handlers will know
-new signature schemes or new token structures before others.
+Alternative B is less attractive because it forces a stronger check even when
+the node only needed to decide whether the message was worth keeping around.
 
-Alternative A makes version skew harder to reason about because there is only
-one coarse call result. Unknown fields, partial support, and degraded operation
-become ambiguous.
+Alternative C can work only for protocols where inspect already provides enough
+for that node's local policy and no stronger admissibility claim is needed.
 
-Alternative B provides a cleaner compatibility story. Older kernels can still
-use inspect results and avoid verify if the handler reports unsupported or
-unknown verification features. Newer handlers can expose more detail without
-forcing older kernels to understand every verification path.
+Observation: relay and archival behavior strengthens the case for a distinct
+inspect phase that stands on its own.
 
-Alternative C helps with evolution if continuation/dependency results are
-represented explicitly and conservatively. A kernel that does not understand a
-future dependency type can still treat it as unresolved and limit resources.
+## 6) Mixed-version evolution and handler diversity
 
-Alternative D is brittle under version skew because policy meanings change over
-time and are hard to transport safely across kernel versions.
+Different handlers will have different abilities. Some may support a meaningful
+cheap inspect phase; others may only know how to do a heavier verify.
 
-Observation: a long-lived ABI should version fact-reporting, not delegate policy
-semantics.
+Alternative A is still the best generic target because it exposes the desirable
+split clearly.
 
-## 6) Buggy or compromised trusted handler
+Alternative B should survive as a fallback for protocols that genuinely have no
+useful inspect path.
 
-The kernel trusts installed handlers, but trust can be broken by bugs,
-compromise, or stale logic.
+Alternative C should survive only as an explicit protocol-local special case:
+no verification-bearing claims, and local policy agrees that inspect is enough.
 
-Alternative A gives too much leverage to one opaque result. If the handler says
-"accept" or "verified," the kernel has little structured context to sanity-check
-the claim.
+Alternative D remains too opaque for a small kernel.
 
-Alternative B limits damage because the kernel sees more structured intermediate
-facts: parse coverage, claimed principals, verification status per claim, and
-actual resource use. That still does not make the handler untrusted, but it does
-reduce blind authority.
+Observation: the kernel should prefer `inspect -> verify -> execute`, but it may
+need a fallback for verify-only handlers.
 
-Alternative C is acceptable only if dependency and continuation results remain
-descriptive, not imperative.
+## What `inspect` should return
 
-Alternative D should be rejected outright in this world. A small kernel should
-not outsource local policy decisions to protocol handlers.
+`inspect` should return cheap triage facts, not policy decisions.
 
-Observation: even with trusted handlers, the ABI should minimize the amount of
-kernel policy authority delegated across the boundary.
+At minimum it should report:
 
-## 7) Relay or archival node with minimal semantic work
+- parse status (`complete`, `partial`, `invalid`, `unsupported`, `truncated`),
+- claimed operation kind,
+- claimed principals / issuers / token references seen syntactically,
+- whether the payload appears to contain verification-bearing claims,
+- whether the protocol believes verify is unnecessary, advisable, or required
+  before generic execution,
+- obvious discard reasons detected cheaply,
+- rough cost estimate for verify and execute,
+- replay or freshness hints that are cheap to observe,
+- optional handler-local detail blob for protocol-specific diagnostics.
 
-Some nodes want to forward, queue, or archive messages with minimal semantic
-cost. They still need spam resistance and some replay/freshness hints.
+This is enough for the kernel to ask: discard now, stop after inspect, or spend
+more on verify?
 
-Alternative A forces them to pay for full verification or accept a weak,
-all-or-nothing summary.
+## What `verify` should return
 
-Alternative B gives them exactly what they need: bounded inspection plus the
-option to stop there. They can record claimed principals, replay keys, and rough
-cost without spending deep verification budget.
+`verify` should return stronger pre-execution facts.
 
-Alternative C is useful as a no-op path: the handler can report that stronger
-claims require provider interaction, and the relay can decline to do that work.
+At minimum it should report:
 
-Alternative D again overreaches because relays need local policy control.
+- verification result per relevant claim or token,
+- whether execution preconditions are satisfied, unresolved, or failed from the
+  protocol's point of view,
+- whether any provider-dependent claim remains conditional,
+- actual resources spent,
+- dependencies consulted, if any,
+- replay-relevant identifiers or freshness outcomes that are stronger than the
+  cheap inspect hints,
+- optional handler-local detail blob for protocol-specific diagnostics.
 
-Observation: relay and archival nodes strengthen the case for a cheap inspect
-phase that stands on its own.
+`verify` still should not tell the kernel to "admit" or "trust" a message. It
+should report protocol facts. The kernel owns policy.
 
-## Derived report contract
+## What `execute` means for the ABI
 
-The scenario analysis rejects policy delegation and rejects a mandatory
-single-call verdict as the only model. The surviving base model is:
+`execute` is not just another introspection phase. It is the point where the
+handler is allowed to carry out the protocol's actual work.
 
-- a transport-neutral two-phase ABI,
-- with inspect and verify phases,
-- where verify may return conditional dependency states instead of pretending
-  provider-dependent truth is settled,
-- and where the kernel remains the only component that makes local policy
-  decisions.
+For this TE, that means:
 
-The minimal report contract should therefore carry facts, costs, and conditions.
-
-### Inspect report
-
-Inspect must be cheap and tightly bounded. It should report:
-
-- report schema/version identifier,
-- pCID / handler identity / handler version,
-- parse status (`complete`, `partial`, `truncated`, `unsupported`, `invalid`),
-- bytes examined and any explicit truncation reason,
-- claimed principals and token issuers observed so far,
-- replay/freshness hints observed cheaply (nonce, sequence, token id, expiry
-  hint, message-local correlation key),
-- estimated cost of deeper verification,
-- dependencies required for stronger claims (provider lookup, key fetch,
-  federation mapping, revocation query),
-- optional opaque handler detail for protocol-local use.
-
-Inspect should not claim that a principal is verified unless that verification is
-part of the inspect budget and is labeled as such.
-
-### Verify report
-
-Verify consumes an explicit kernel-granted budget and should report:
-
-- all inspect facts needed for correlation,
-- verification result per claim or token, not just one global verdict,
-- statuses such as `verified`, `unverified`, `unsupported`, `deferred`,
-  `revoked`, `provider-unreachable`, `dependency-missing`, and `expired`,
-- actual resources spent (time, bytes, external queries, signatures checked),
-- which dependencies were consulted and with what outcome,
-- whether the result is locally final or conditional on provider freshness,
-- optional replay disposition inputs (for example, a stable replay key and the
-  confidence level that it is safe to use).
-
-Verify should still avoid policy words such as "admit", "route", "trust", or
-"allocate". Those are kernel decisions. The handler may return evidence that the
-kernel can use to make those decisions.
-
-### Optional continuation state
-
-The ABI does not need a third mandatory phase, but it should allow verify to
-return resumable state when provider interaction or long-running checks are
-deferred. That state should be descriptive and bounded:
-
-- what is still needed,
-- what was already verified,
-- what deadline or freshness window applies,
-- what budget was already consumed.
-
-That keeps continuation as an extension of verify rather than a separate,
-always-present architecture.
-
-## Kernel and handler responsibilities
-
-### Kernel responsibilities
-
-- Route payloads to handlers by pCID.
-- Set inspect and verify budgets separately.
-- Decide whether to stop after inspect or spend more on verify.
-- Own local admission, scheduling, quota, cache, replay, and trust policy.
-- Treat provider-dependent claims as conditional unless the report says the
-  provider was actually consulted and the freshness bounds are explicit.
-
-### Handler responsibilities
-
-- Parse payload according to protocol rules.
-- Report observed and verified facts within the granted budget.
-- Surface conditions, dependencies, and uncertainty explicitly.
-- Never make promises on behalf of providers, peers, or the kernel's local
-  policy engine.
+- `execute` should not be conflated with `verify`,
+- the kernel should know whether it is still gathering evidence or has crossed
+  into admitted processing,
+- and the generic kernel/handler contract should keep the read-only gates
+  (`inspect`, `verify`) conceptually separate from `execute`.
 
 ## Conclusions
 
-Rejected alternatives:
+Rejected as the generic model:
 
-- **D. Policy-delegating ABI** is rejected. It violates the Promise Theory
-  constraint and makes the kernel too large in the wrong direction by turning
-  protocol handlers into policy authorities.
-- **A. Single-call verdict ABI as the only contract** is rejected. It hides cost,
-  collapses conditional truths, and prevents the kernel from making fine-grained
-  resource decisions.
+- **single-call `process`**: too opaque for a small kernel that wants to meter
+  cost and reason about discard vs admit decisions.
+- **`inspect -> execute` as the generic model**: too weak once signatures and
+  capability-bearing claims move into payload.
 
 Surviving alternatives:
 
-- **B. Two-phase inspect/verify ABI** survives as the base model.
-- **C. Continuation/dependency results** survive as an extension of verify, not
-  as a separate primary architecture.
+- **`inspect -> verify -> execute`** survives as the best generic model.
+- **`verify -> execute`** survives as a fallback for protocols that do not have a
+  meaningful cheap inspect path.
+- **`inspect -> execute`** survives only as a constrained protocol-local special
+  case where no stronger verification-bearing claims exist and local policy
+  explicitly accepts that tradeoff.
 
 Recommended conclusion:
 
-- The kernel/handler boundary should be a small, transport-neutral, fact-reporting
-  ABI with separate inspect and verify phases.
-- The handler should report observations, verification status per claim, budget
-  use, and unresolved dependencies.
-- The kernel should keep all resource allocation, admission, and trust policy
-  decisions local.
+- The generic kernel lifecycle should be `inspect -> verify -> execute`.
+- `inspect` and `verify` are different because they answer different kernel
+  questions: "is deeper work justified?" vs "is execution admissible?"
+- `execute` must remain explicit because it is the admission boundary where the
+  handler stops merely describing the message and starts doing the protocol's
+  work.
+- The kernel should prefer handlers that can provide cheap inspect data, but it
+  may need to support verify-first handlers as a fallback.
 
 ## Exact DF question that remains
 
 Before any code or Go interfaces are locked, one DF choice still remains:
 
-- Should the first implementation treat dependency handling as:
-  - a verify result with inline deferred statuses only, or
-  - a resumable verify flow with an explicit continuation token/state object?
+- Must every handler implement a distinct `inspect` phase, or may a handler
+  declare that it has no meaningful cheap inspect path and therefore uses
+  `verify -> execute`?
 
-The TE supports both, but recommends starting with inline deferred statuses
-unless concrete use cases require resumable long-running checks immediately.
+This TE recommends treating `inspect -> verify -> execute` as the target model,
+while allowing `verify -> execute` only as an explicit fallback if needed.
 
 ## Implications for open TODOs and DIs
 
-- `002.9` should compare signature placement using the same rule: handlers may
-  surface facts to the kernel, but they should not own kernel policy.
-- `002.11` should treat the report schema/version as the long-horizon
-  compatibility boundary, not any one runtime binding.
-- `001.4` and `001.5` should not lock handler APIs or storage shapes that assume
-  a single-call verdict model.
-- A future DI should lock the post-TE DF choice for deferred-status-only versus
-  resumable continuation.
+- `002.9` should compare signature placement using this same lifecycle framing:
+  moving signatures into payload increases the need for a handler-visible verify
+  phase before generic execution.
+- `002.11` should treat handler report/version compatibility separately for
+  inspect, verify, and execute rather than assuming one opaque process call.
+- `001.4` and `001.5` should avoid baking in a single-call handler API shape.
+- The earlier DF question about deferred-status-only versus resumable
+  continuation becomes secondary and should be revisited only after the
+  inspect/verify/execute split is locked.
