@@ -70,7 +70,7 @@ cannot safely jump straight from routing to execution for every protocol.
 - Mark Burgess's Promise Theory rule applies: a handler may report facts about
   what it observed or verified, but it must not make promises on behalf of other
   agents or providers.
-- A capability token is a provider promise. Revocation is real. "Signature
+- A capability token is a provider promise. Revocation can happen. "Signature
   verifies" is not the same as "provider will currently honor this."
 - The ABI should be transport-neutral so the same conceptual contract can work
   in-process, out-of-process, or in a sandbox.
