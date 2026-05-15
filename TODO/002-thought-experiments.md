@@ -1,5 +1,32 @@
 ## Decision Intent Log
 
+ID: DI-002-20260428-235845
+Date: 2026-04-28 23:58:45 UTC
+Status: active
+Decision:
+- Normalize `docs/thought-experiments/grid-based-aviation-take2.md` in place as a
+  repo-style thought-experiment note.
+- Expand its executable-standards and sandboxing discussion beyond WASM to the
+  same runtime families covered by `TE-20260426-220037-runtime-environments.md`.
+Intent:
+- Keep the note aligned with the current PromiseGrid philosophy: universal graph
+  legibility, hash-derived identifiers, portable executable checks, and
+  deterministic coordination do not imply central registries or hierarchy.
+- Replace the note's current prompt-transcript form and WASM monoculture with a
+  cleaner, runtime-aware statement that remains anti-DAO, anti-single-currency,
+  and pro-capability-token.
+Constraints:
+- Keep `grid-based-aviation-take2.md` as a special-case note at its current
+  path; do not promote it to a numbered TE artifact.
+- Mirror the runtime coverage from `002.24`: native, containers, VMs,
+  microVM-like hosts, browser/serverless/standalone WASM, standalone/serverless
+  WASI, microcontrollers, mobile, game engines, and delegated-signing servers.
+- Treat executable standards as portable, content-addressed predicates that may
+  have more than one runtime realization.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/thought-experiments/grid-based-aviation-take2.md`
+
 ID: DI-002-20260426-232002
 Date: 2026-04-26 23:20:02 UTC
 Status: active
