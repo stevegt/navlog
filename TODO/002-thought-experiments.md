@@ -1,5 +1,29 @@
 ## Decision Intent Log
 
+ID: DI-002-20260515-165527
+Date: 2026-05-15 16:55:27 UTC
+Status: active
+Decision:
+- Write `docs/promisegrid-handoff.md` as a comprehensive cross-repo handoff of
+  the PromiseGrid-relevant design work in this repo for the `~/lab/wire-lab`
+  team.
+Intent:
+- Give wire-lab a simulation-ready source map that distinguishes navlog-local
+  implementation locks from broader PromiseGrid hypotheses, strong conclusions,
+  and still-open design forks.
+- Reduce clarification churn by making the current design posture, specimen
+  candidates, and recommended simulation backlog explicit in one document.
+Constraints:
+- Do not present navlog-local implementation choices as global PromiseGrid law.
+- Keep the handoff grounded in the existing README, protocol doc, DI logs, and
+  thought experiments in this repo, while explicitly aligning with wire-lab's
+  apparatus-versus-specimen discipline.
+- Include recommended simulation work items, but keep the document descriptive
+  rather than prescriptive about final PromiseGrid architecture.
+Affects:
+- `TODO/002-thought-experiments.md`
+- `docs/promisegrid-handoff.md`
+
 ID: DI-002-20260428-235845
 Date: 2026-04-28 23:58:45 UTC
 Status: active
@@ -663,3 +687,10 @@ Thought experiments already written:
   navigation, and evolve an aviation industry without relying on blockchain,
   cryptocurrency, or DAO framing.
   See `docs/thought-experiments/TE-20260426-230939-grid-based-aviation.md`.
+
+### Handoffs / Cross-Repo Inputs
+
+- [x] 002.26 PromiseGrid design handoff for wire-lab simulations: write
+  `docs/promisegrid-handoff.md` as a simulation-oriented synthesis of this
+  repo's PromiseGrid work, including local locks, broader design posture,
+  simulation-ready hypotheses, source map, and recommended wire-lab backlog.
